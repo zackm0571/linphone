@@ -53,7 +53,7 @@ option(ENABLE_UPNP "Build with uPnP support." YES)
 option(ENABLE_VIDEO "Build with video support." YES)
 cmake_dependent_option(ENABLE_ASSISTANT "Turn on assistant compiling." YES "ENABLE_GTK_UI" NO)
 option(ENABLE_DEBUG_LOGS "Turn on or off debug level logs." NO)
-option(ENABLE_NLS "Build with internationalisation support" YES)
+option(ENABLE_NLS "Build with internationalisation support" NO)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")

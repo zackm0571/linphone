@@ -12,7 +12,7 @@
          defined by jhbuild, so it you are not using jhbuild you can
          either define your own or just hardcode the path here.
     -->
-    <prefix name="default">/opt/local</prefix>
+    <prefix name="default">/usr/local</prefix>
     <prefix name="linphone">${env:LINPHONE_INSTALL_PREFIX}</prefix>
     <prefix name="ms2plugins">${env:MS2_PLUGINS_INSTALL_PREFIX}</prefix>
     <!-- This prefix definition is necessary if some dependencies are to be taken from /usr/local/lib -->

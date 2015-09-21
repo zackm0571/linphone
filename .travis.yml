@@ -1,0 +1,5 @@
+language: objective-c
+before_script:
+- git submodule update --init --recursive
+script:
+- ./tools/linphone-mac-build.sh

@@ -7,6 +7,9 @@ if [ -z "$HOMEBREW_GITHUB_API_TOKEN" ]; then unset HOMEBREW_GITHUB_API_TOKEN ; f
 set -ex
 
 which brew || ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+brew tap homebrew/dupes
+
 brew update
 
 brew tap ianblenke/taps

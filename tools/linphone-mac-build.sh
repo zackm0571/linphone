@@ -8,6 +8,10 @@ set -ex
 
 which brew || ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
+
+brew tap ianblenke/taps
+brew install ianblenke/taps/postgis
+
 brew upgrade
 #brew doctor
 

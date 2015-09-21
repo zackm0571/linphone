@@ -10,7 +10,7 @@ which brew || ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/i
 brew update
 
 brew tap ianblenke/taps
-brew install ianblenke/taps/postgis
+brew tap-pin ianblenke/taps
 
 brew upgrade
 #brew doctor

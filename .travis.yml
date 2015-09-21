@@ -2,4 +2,7 @@ language: objective-c
 before_script:
 - git submodule update --init --recursive
 script:
-- ./tools/linphone-mac-build.sh
+- "./tools/linphone-mac-build.sh"
+notifications:
+  flowdock:
+    secure: 1L4QWM5L3YGMgo58zbDkDpAHC2Yn9iEslUs6bH4aaiTtUDzdn6bqhUULsmVvw0UgycRU8rmKz/20VUhCyPfZVMpBGndCHo7aTDedyU1DKvn8Mkbzw7ybunA5JzyB7DU+FacqOdYs5aIkbLSB+/YGJBxCCrkHIVvT0phdNA4EnjBLGZ8vh8F9J0vxDedUoNY96eNlRsv3jILUXMXZldPeU3xa7B3CVgI/h3HQvOFgBASk6dkA3x+Q2/Xx9aWS2F6VaoGJ1HmHTbRU2ZvNTCEi5cLmZqBxemyVA6rrLETcPNs0xvBC5566tPt2W3JCH9825YUlwIUHvLCZLd75Y8+yDQ1YSQVxHPO6zUm5GGdCGIFlhk+Qs70OLpC+6nMyPjbBvOKeNHEoBaqGIY5oh213jxfiyuSvZa6ZyZ0dWRWfKHvJ/pmzbx2mGWrSKj4DlN+klpjuXA3RK01sF8gGc+DpFVtad522Lhj7zL6a9XzNJCsOaF388QkmTXybcMDGnen+Fxeq9DK9R+9VJWREC3PYTAweg+oLVQ7iqMO1zZyMGpZ11ozZ96nW1ZVZztPut5DTxpAZ40tb1jz+pqq2eGZOvgPjUpA8FvLLtlageR3u4LS0IpxnoKgl8u0gNuDJ2xESI3XJVT/Ky9M5YklYdSR7Ui/meDPl/mWBgAiqGqBHQuo=

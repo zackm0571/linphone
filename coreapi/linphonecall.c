@@ -3527,61 +3527,6 @@ static void linphone_call_start_text_stream(LinphoneCall *call) {
 	}
 }
 
-static void setZrtpCryptoTypesParameters(MSZrtpParams *params, LinphoneCore *lc)
-{
-	int i;
-	const MSCryptoSuite *srtp_suites;
-	MsZrtpCryptoTypesCount ciphersCount, authTagsCount;
-
-	if (params == NULL) return;
-	if (lc == NULL) return;
-
-	srtp_suites = linphone_core_get_srtp_crypto_suites(lc);
-	if (srtp_suites!=NULL) {
-		for(i=0; srtp_suites[i]!=MS_CRYPTO_SUITE_INVALID && i<SAL_CRYPTO_ALGO_MAX && i<MS_MAX_ZRTP_CRYPTO_TYPES; ++i){
-			switch (srtp_suites[i]) {
-				case MS_AES_128_SHA1_32:
-					params->ciphers[params->ciphersCount++] = MS_ZRTP_CIPHER_AES1;
-					params->authTags[params->authTagsCount++] = MS_ZRTP_AUTHTAG_HS32;
-					break;
-				case MS_AES_128_NO_AUTH:
-					params->ciphers[params->ciphersCount++] = MS_ZRTP_CIPHER_AES1;
-					break;
-				case MS_NO_CIPHER_SHA1_80:
-					params->authTags[params->authTagsCount++] = MS_ZRTP_AUTHTAG_HS80;
-					break;
-				case MS_AES_128_SHA1_80:
-					params->ciphers[params->ciphersCount++] = MS_ZRTP_CIPHER_AES1;
-					params->authTags[params->authTagsCount++] = MS_ZRTP_AUTHTAG_HS80;
-					break;
-				case MS_AES_256_SHA1_80:
-					params->ciphers[params->ciphersCount++] = MS_ZRTP_CIPHER_AES3;
-					params->authTags[params->authTagsCount++] = MS_ZRTP_AUTHTAG_HS80;
-					break;
-				case MS_AES_256_SHA1_32:
-					params->ciphers[params->ciphersCount++] = MS_ZRTP_CIPHER_AES3;
-					params->authTags[params->authTagsCount++] = MS_ZRTP_AUTHTAG_HS32;
-					break;
-				case MS_CRYPTO_SUITE_INVALID:
-					break;
-			}
-		}
-	}
-
-	/* linphone_core_get_srtp_crypto_suites is used to determine sensible defaults; here each can be overridden */
-	ciphersCount = linphone_core_get_zrtp_cipher_suites(lc, params->ciphers); /* if not present in config file, params->ciphers is not modified */
-	if (ciphersCount!=0) { /* use zrtp_cipher_suites config only when present, keep config from srtp_crypto_suite otherwise */
-		params->ciphersCount = ciphersCount;
-	}
-	params->hashesCount = linphone_core_get_zrtp_hash_suites(lc, params->hashes);
-	authTagsCount = linphone_core_get_zrtp_auth_suites(lc, params->authTags); /* if not present in config file, params->authTags is not modified */
-	if (authTagsCount!=0) {
-		params->authTagsCount = authTagsCount; /* use zrtp_auth_suites config only when present, keep config from srtp_crypto_suite otherwise */
-	}
-	params->sasTypesCount = linphone_core_get_zrtp_sas_suites(lc, params->sasTypes);
-	params->keyAgreementsCount = linphone_core_get_zrtp_key_agreement_suites(lc, params->keyAgreements);
-}
-
 static void linphone_call_set_symmetric_rtp(LinphoneCall *call, bool_t val){
 	int i;
 	for (i = 0; i < SAL_MEDIA_DESCRIPTION_MAX_STREAMS; ++i){

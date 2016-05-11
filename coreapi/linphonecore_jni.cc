@@ -1649,6 +1649,14 @@ extern "C" jboolean Java_org_linphone_core_LinphoneCoreImpl_isInCall(JNIEnv* env
 
 	return (jboolean)linphone_core_in_call((LinphoneCore*)lc);
 }
+
+extern "C" jboolean Java_org_linphone_core_LinphoneFriendImpl_isPresenceReceived(JNIEnv* env
+		,jobject  thiz
+		,jlong lf) {
+
+	return (jboolean)linphone_friend_is_presence_received((LinphoneFriend*)lf);
+}
+
 extern "C" jboolean Java_org_linphone_core_LinphoneCoreImpl_isInComingInvitePending(JNIEnv* env
 		,jobject  thiz
 		,jlong lc) {
@@ -1782,7 +1790,7 @@ extern "C" void Java_org_linphone_core_LinphoneCoreImpl_muteMic(	JNIEnv*  env
 		,jobject  thiz
 		,jlong lc
 		,jboolean isMuted) {
-		linphone_core_mute_mic((LinphoneCore*)lc,isMuted);
+		linphone_core_enable_mic((LinphoneCore*)lc,isMuted);
 }
 
 extern "C" jlong Java_org_linphone_core_LinphoneCoreImpl_interpretUrl(	JNIEnv*  env
@@ -2059,6 +2067,10 @@ extern "C" void Java_org_linphone_core_LinphoneFriendListImpl_exportFriendsToVCa
 	const char* path = env->GetStringUTFChars(jpath, NULL);
 	linphone_friend_list_export_friends_as_vcard4_file((LinphoneFriendList*)list, path);
 	env->ReleaseStringUTFChars(jpath, path);
+}
+
+extern "C" void Java_org_linphone_core_LinphoneFriendListImpl_enableSubscriptions(JNIEnv* env, jobject thiz, jlong list, jboolean enable) {
+	linphone_friend_list_enable_subscriptions((LinphoneFriendList*)list, enable);
 }
 
 extern "C" void Java_org_linphone_core_LinphoneCoreImpl_addFriendList(JNIEnv*  env
@@ -3647,12 +3659,18 @@ extern "C" void  Java_org_linphone_core_LinphoneFriendImpl_finalize(JNIEnv*  env
 	linphone_friend_unref(lfriend);
 }
 
-extern "C" void  Java_org_linphone_core_LinphoneFriendListImpl_finalize(JNIEnv*  env
+extern "C" void Java_org_linphone_core_LinphoneFriendListImpl_finalize(JNIEnv*  env
 																		,jobject  thiz
 																		,jlong ptr) {
 	LinphoneFriendList *lfriendList=(LinphoneFriendList*)ptr;
 	linphone_friend_list_set_user_data(lfriendList,NULL);
 	linphone_friend_list_unref(lfriendList);
+}
+
+extern "C" void Java_org_linphone_core_LinphoneFriendImpl_setPresenceModel(JNIEnv *env, jobject jobj, jlong ptr, jlong modelPtr) {
+	LinphoneFriend *lf = (LinphoneFriend *)ptr;
+	LinphonePresenceModel *model = (LinphonePresenceModel *)modelPtr;
+	linphone_friend_set_presence_model(lf, model);
 }
 
 /*
@@ -3713,10 +3731,12 @@ extern "C" jobjectArray _LinphoneChatRoomImpl_getHistory(JNIEnv* env, jobject th
 			env->SetObjectArrayElement(jHistory, i, jmsg);
 			env->DeleteLocalRef(jmsg);
 		}
+		
 		history = history->next;
 	}
-
-	ms_list_free(list);
+	/*getChatMessage() acquired a ref that is "transfered" to the java object. We must drop
+		* the reference given by linphone_chat_room_get_history_range()*/
+	ms_list_free_with_data(list, (void (*)(void*))linphone_chat_message_unref);
 	return jHistory;
 }
 extern "C" jobjectArray Java_org_linphone_core_LinphoneChatRoomImpl_getHistoryRange(JNIEnv*  env
@@ -5314,9 +5334,16 @@ JNIEXPORT jobject JNICALL Java_org_linphone_core_LinphoneCoreImpl_publish(JNIEnv
 
 // LpConfig
 extern "C" jlong Java_org_linphone_core_LpConfigImpl_newLpConfigImpl(JNIEnv *env, jobject thiz, jstring file) {
-		const char *cfile = env->GetStringUTFChars(file, NULL);
-		LpConfig *lp = lp_config_new(cfile);
+	const char *cfile = env->GetStringUTFChars(file, NULL);
+	LpConfig *lp = lp_config_new(cfile);
 	env->ReleaseStringUTFChars(file, cfile);
+	return (jlong) lp;
+}
+
+extern "C" jlong Java_org_linphone_core_LpConfigImpl_newLpConfigImplFromBuffer(JNIEnv *env, jobject thiz, jstring buffer) {
+	const char *cbuffer = env->GetStringUTFChars(buffer, NULL);
+	LpConfig *lp = lp_config_new_from_buffer(cbuffer);
+	env->ReleaseStringUTFChars(buffer, cbuffer);
 	return (jlong) lp;
 }
 

@@ -63,6 +63,7 @@ typedef struct _LpItem{
 	char *value;
 	int is_comment;
 	bool_t overwrite; // If set to true, will add overwrite=true when converted to xml
+	bool_t skip; // If set to true, won't be dumped when converted to xml
 } LpItem;
 
 typedef struct _LpSectionParam{
@@ -75,6 +76,7 @@ typedef struct _LpSection{
 	MSList *items;
 	MSList *params;
 	bool_t overwrite; // If set to true, will add overwrite=true to all items of this section when converted to xml
+	bool_t skip; // If set to true, won't be dumped when converted to xml
 } LpSection;
 
 struct _LpConfig{
@@ -576,7 +578,7 @@ bool_t lp_config_get_overwrite_flag_for_entry(const LpConfig *lpconfig, const ch
 		item = lp_section_find_item(sec, key);
 		if (item != NULL) return item->overwrite;
 	}
-	return 0;
+	return FALSE;
 }
 
 bool_t lp_config_get_overwrite_flag_for_section(const LpConfig *lpconfig, const char *section) {
@@ -585,7 +587,27 @@ bool_t lp_config_get_overwrite_flag_for_section(const LpConfig *lpconfig, const 
 	if (sec != NULL){
 		return sec->overwrite;
 	}
-	return 0;
+	return FALSE;
+}
+
+bool_t lp_config_get_skip_flag_for_entry(const LpConfig *lpconfig, const char *section, const char *key) {
+	LpSection *sec;
+	LpItem *item;
+	sec = lp_config_find_section(lpconfig, section);
+	if (sec != NULL){
+		item = lp_section_find_item(sec, key);
+		if (item != NULL) return item->skip;
+	}
+	return FALSE;
+}
+
+bool_t lp_config_get_skip_flag_for_section(const LpConfig *lpconfig, const char *section) {
+	LpSection *sec;
+	sec = lp_config_find_section(lpconfig, section);
+	if (sec != NULL){
+		return sec->skip;
+	}
+	return FALSE;
 }
 
 void lp_config_set_string(LpConfig *lpconfig,const char *section, const char *key, const char *value){
@@ -655,6 +677,24 @@ void lp_config_set_overwrite_flag_for_section(LpConfig *lpconfig, const char *se
 	sec = lp_config_find_section(lpconfig, section);
 	if (sec != NULL) {
 		sec->overwrite = value;
+	}
+}
+
+void lp_config_set_skip_flag_for_entry(LpConfig *lpconfig, const char *section, const char *key, bool_t value) {
+	LpSection *sec;
+	LpItem *item;
+	sec = lp_config_find_section(lpconfig, section);
+	if (sec != NULL) {
+		item = lp_section_find_item(sec, key);
+		if (item != NULL) item->skip = value;
+	}
+}
+
+void lp_config_set_skip_flag_for_section(LpConfig *lpconfig, const char *section, bool_t value) {
+	LpSection *sec;
+	sec = lp_config_find_section(lpconfig, section);
+	if (sec != NULL) {
+		sec->skip = value;
 	}
 }
 
@@ -923,26 +963,53 @@ const char** lp_config_get_sections_names(LpConfig *lpconfig) {
 	const MSList *sections = lpconfig->sections;
 	int ndev;
 	int i;
-	
+
 	ndev = ms_list_size(sections);
 	sections_names = ms_malloc((ndev + 1) * sizeof(const char *));
-	
+
 	for (i = 0; sections != NULL; sections = sections->next, i++) {
 		LpSection *section = (LpSection *)sections->data;
 		sections_names[i] = ms_strdup(section->name);
 	}
-	
+
 	sections_names[ndev] = NULL;
 	return sections_names;
 }
 
 char* lp_config_dump_as_xml(const LpConfig *lpconfig) {
 	char *buffer;
-	
+
 	lpc2xml_context *ctx = lpc2xml_context_new(NULL, NULL);
 	lpc2xml_set_lpc(ctx, lpconfig);
 	lpc2xml_convert_string(ctx, &buffer);
 	lpc2xml_context_destroy(ctx);
-	
+
+	return buffer;
+}
+
+struct _entry_data {
+	const LpConfig *conf;
+	const char *section;
+	char** buffer;
+};
+
+static void dump_entry(const char *entry, void *data) {
+	struct _entry_data *d = (struct _entry_data *) data;
+	const char *value = lp_config_get_string(d->conf, d->section, entry, "");
+	*d->buffer = ms_strcat_printf(*d->buffer, "\t%s=%s\n", entry, value);
+}
+
+static void dump_section(const char *section, void *data) {
+	struct _entry_data *d = (struct _entry_data *) data;
+	d->section = section;
+	*d->buffer = ms_strcat_printf(*d->buffer, "[%s]\n", section);
+	lp_config_for_each_entry(d->conf, section, dump_entry, d);
+}
+
+char* lp_config_dump(const LpConfig *lpconfig) {
+	char* buffer = NULL;
+	struct _entry_data d = { lpconfig, NULL, &buffer };
+	lp_config_for_each_section(lpconfig, dump_section, &d);
+
 	return buffer;
 }

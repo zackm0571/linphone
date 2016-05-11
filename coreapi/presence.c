@@ -231,8 +231,12 @@ static void presence_person_add_note(LinphonePresencePerson *person, LinphonePre
 	person->notes = ms_list_append(person->notes, note);
 }
 
+static int presence_model_insert_person_by_timestamp(LinphonePresencePerson *current, LinphonePresencePerson *to_insert) {
+	return current->timestamp < to_insert->timestamp;
+}
+
 static void presence_model_add_person(LinphonePresenceModel *model, LinphonePresencePerson *person) {
-	model->persons = ms_list_append(model->persons, person);
+	model->persons = ms_list_insert_sorted(model->persons, linphone_presence_person_ref(person), (MSCompareFunc)presence_model_insert_person_by_timestamp);
 }
 
 static void presence_model_add_note(LinphonePresenceModel *model, LinphonePresenceNote *note) {
@@ -364,11 +368,14 @@ struct _get_activity_st {
 };
 
 static void presence_model_get_activity(const LinphonePresencePerson *person, struct _get_activity_st *st) {
-	unsigned int size = ms_list_size(person->activities);
-	if (st->requested_idx < (st->current_idx + size)) {
-		st->activity = (LinphonePresenceActivity *)ms_list_nth_data(person->activities, st->requested_idx - st->current_idx);
-	} else {
-		st->current_idx += size;
+	if (st->current_idx != (unsigned)-1) {
+		unsigned int size = ms_list_size(person->activities);
+		if (st->requested_idx < (st->current_idx + size)) {
+			st->activity = (LinphonePresenceActivity *)ms_list_nth_data(person->activities, st->requested_idx - st->current_idx);
+			st->current_idx = (unsigned)-1;
+		} else {
+			st->current_idx += size;
+		}
 	}
 }
 
@@ -660,7 +667,7 @@ LinphonePresencePerson * linphone_presence_model_get_nth_person(const LinphonePr
 
 int linphone_presence_model_add_person(LinphonePresenceModel *model, LinphonePresencePerson *person) {
 	if ((model == NULL) || (person == NULL)) return -1;
-	model->persons = ms_list_append(model->persons, linphone_presence_person_ref(person));
+	presence_model_add_person(model, person);
 	return 0;
 }
 
@@ -674,7 +681,7 @@ int linphone_presence_model_clear_persons(LinphonePresenceModel *model) {
 }
 
 int linphone_presence_model_set_presentity(LinphonePresenceModel *model, const LinphoneAddress *presentity) {
-	
+
 	if (model->presentity) {
 		linphone_address_unref(model->presentity);
 		model->presentity = NULL;
@@ -816,7 +823,8 @@ LinphonePresenceActivity * linphone_presence_person_get_nth_activity(const Linph
 
 int linphone_presence_person_add_activity(LinphonePresencePerson *person, LinphonePresenceActivity *activity) {
 	if ((person == NULL) || (activity == NULL)) return -1;
-	person->activities = ms_list_append(person->activities, linphone_presence_activity_ref(activity));
+	// insert in first position since its the most recent activity!
+	person->activities = ms_list_prepend(person->activities, linphone_presence_activity_ref(activity));
 	return 0;
 }
 
@@ -1376,6 +1384,7 @@ static int process_pidf_xml_presence_persons(xmlparsing_context_t *xml_ctx, Linp
 			else
 				timestamp = parse_timestamp(person_timestamp_str);
 			person = presence_person_new(person_id_str, timestamp);
+
 			if (person != NULL) {
 				err = process_pidf_xml_presence_person_activities(xml_ctx, person, i);
 				if (err == 0) {
@@ -1462,7 +1471,7 @@ static LinphonePresenceModel * process_pidf_xml_presence_notification(xmlparsing
 void linphone_core_add_subscriber(LinphoneCore *lc, const char *subscriber, SalOp *op){
 	LinphoneFriend *fl=linphone_core_create_friend_with_address(lc,subscriber);
 	char *tmp;
-	
+
 	if (fl==NULL) return ;
 	fl->lc = lc;
 	linphone_friend_add_incoming_subscription(fl, op);
@@ -1470,11 +1479,11 @@ void linphone_core_add_subscriber(LinphoneCore *lc, const char *subscriber, SalO
 	fl->inc_subscribe_pending=TRUE;
 	/* the newly created "not yet" friend ownership is transfered to the lc->subscribers list*/
 	lc->subscribers=ms_list_append(lc->subscribers,fl);
-	
+
 	tmp = linphone_address_as_string(fl->uri);
 	linphone_core_notify_new_subscription_requested(lc,fl,tmp);
 	ms_free(tmp);
-	
+
 }
 
 void linphone_core_reject_subscriber(LinphoneCore *lc, LinphoneFriend *lf){
@@ -1500,12 +1509,13 @@ void linphone_subscription_new(LinphoneCore *lc, SalOp *op, const char *from){
 	ms_message("Receiving new subscription from %s.",from);
 
 	/* check if we answer to this subscription */
-	if (linphone_core_get_default_friend_list(lc) != NULL) {
-		lf = linphone_friend_list_find_friend_by_address(linphone_core_get_default_friend_list(lc), uri);
-	}
+	lf = linphone_core_find_friend(lc, uri);
 	if (lf!=NULL){
 		linphone_friend_add_incoming_subscription(lf, op);
 		lf->inc_subscribe_pending=TRUE;
+		if (lp_config_get_int(lc->config,"sip","notify_pending_state",0)) {
+			sal_notify_pending_state(op);
+		}
 		sal_subscribe_accept(op);
 		linphone_friend_done(lf);	/*this will do all necessary actions */
 	}else{
@@ -1795,7 +1805,7 @@ char *linphone_presence_model_to_xml(LinphonePresenceModel *model) {
 	int err;
 	char *contact = NULL;
 	char * content = NULL;
-	
+
 	if (model->presentity) {
 		contact = linphone_address_as_string_uri_only(model->presentity);
 	} else {
@@ -1880,10 +1890,10 @@ void linphone_notify_recv(LinphoneCore *lc, SalOp *op, SalSubscribeStatus ss, Sa
 	LinphonePresenceModel *presence = model ? (LinphonePresenceModel *)model:linphone_presence_model_new_with_activity(LinphonePresenceActivityOffline, NULL);
 
 	if (linphone_core_get_default_friend_list(lc) != NULL)
-		lf=linphone_friend_list_find_friend_by_out_subscribe(linphone_core_get_default_friend_list(lc), op);
+		lf=linphone_core_find_friend_by_out_subscribe(lc, op);
 	if (lf==NULL && lp_config_get_int(lc->config,"sip","allow_out_of_subscribe_presence",0)){
 		const SalAddress *addr=sal_op_get_from_address(op);
-		lf = linphone_friend_list_find_friend_by_address(linphone_core_get_default_friend_list(lc), (LinphoneAddress *)addr);
+		lf = linphone_core_find_friend(lc, (LinphoneAddress *)addr);
 	}
 	if (lf!=NULL){
 		LinphonePresenceActivity *activity = NULL;
@@ -1897,6 +1907,7 @@ void linphone_notify_recv(LinphoneCore *lc, SalOp *op, SalSubscribeStatus ss, Sa
 		linphone_friend_set_presence_model(lf, presence);
 		lf->subscribe_active=TRUE;
 		lf->presence_received = TRUE;
+		lf->out_sub_state = linphone_subscription_state_from_sal(ss);
 		linphone_core_notify_notify_presence_received(lc,(LinphoneFriend*)lf);
 		ms_free(tmp);
 		if (op != lf->outsub){
@@ -1929,8 +1940,7 @@ void linphone_notify_recv(LinphoneCore *lc, SalOp *op, SalSubscribeStatus ss, Sa
 void linphone_subscription_closed(LinphoneCore *lc, SalOp *op){
 	LinphoneFriend *lf = NULL;
 
-	if (linphone_core_get_default_friend_list(lc) != NULL)
-		lf = linphone_friend_list_find_friend_by_inc_subscribe(linphone_core_get_default_friend_list(lc), op);
+	lf = linphone_core_find_friend_by_inc_subscribe(lc, op);
 
 	if (lf!=NULL){
 		/*this will release the op*/

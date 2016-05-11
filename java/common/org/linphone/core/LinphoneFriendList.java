@@ -28,7 +28,11 @@ public interface LinphoneFriendList {
 	public void addLocalFriend(LinphoneFriend friend);
 	public LinphoneFriend[] getFriendList();
 	public void updateSubscriptions(LinphoneProxyConfig proxyConfig,boolean onlyWhenRegistered);
+<<<<<<< HEAD
 	public void closeSubscriptions();
+=======
+	public void enableSubscriptions(boolean enable);
+>>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	public LinphoneFriend findFriendByUri(String uri);
 	public void setUri(String uri);
 	public void synchronizeFriendsFromServer();

@@ -83,7 +83,7 @@ void liblinphone_tester_enable_ipv6(bool_t enabled){
 
 LinphoneAddress * create_linphone_address(const char * domain) {
 	LinphoneAddress *addr = linphone_address_new(NULL);
-	BC_ASSERT_PTR_NOT_NULL_FATAL(addr);
+	if (!BC_ASSERT_PTR_NOT_NULL(addr)) return NULL;
 	linphone_address_set_username(addr,test_username);
 	BC_ASSERT_STRING_EQUAL(test_username,linphone_address_get_username(addr));
 	if (!domain) domain= test_route;
@@ -263,6 +263,10 @@ bool_t transport_supported(LinphoneTransportType transport) {
 	return supported;
 }
 
+#if __clang__ || ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
+#pragma GCC diagnostic push
+#endif
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 void linphone_core_manager_init(LinphoneCoreManager *mgr, const char* rc_file) {
 	char *rc_path = NULL;
 	char *hellopath = bc_tester_res("sounds/hello8000.wav");
@@ -334,6 +338,9 @@ void linphone_core_manager_init(LinphoneCoreManager *mgr, const char* rc_file) {
 
 	if (rc_path) ms_free(rc_path);
 }
+#if __clang__ || ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
+#pragma GCC diagnostic pop
+#endif
 
 void linphone_core_manager_start(LinphoneCoreManager *mgr, int check_for_proxies) {
 	LinphoneProxyConfig* proxy;
@@ -385,7 +392,7 @@ LinphoneCoreManager* linphone_core_manager_new( const char* rc_file) {
 	return manager;
 }
 
-LinphoneCoreManager* linphone_core_manager_new2( const char* rc_file, int check_for_proxies) {
+LinphoneCoreManager* linphone_core_manager_new2(const char* rc_file, int check_for_proxies) {
 	LinphoneCoreManager *manager = ms_new0(LinphoneCoreManager, 1);
 	linphone_core_manager_init(manager, rc_file);
 	linphone_core_manager_start(manager, check_for_proxies);
@@ -406,7 +413,6 @@ void linphone_core_manager_uninit(LinphoneCoreManager *mgr) {
 	if (mgr->stat.last_received_info_message) linphone_info_message_destroy(mgr->stat.last_received_info_message);
 	if (mgr->lc){
 		const char *record_file=linphone_core_get_record_file(mgr->lc);
-		int unterminated_calls;
 
 		if (!liblinphone_tester_keep_record_files && record_file){
 			if ((bc_get_number_of_failures()-mgr->number_of_cunit_error_at_creation)>0) {
@@ -414,10 +420,6 @@ void linphone_core_manager_uninit(LinphoneCoreManager *mgr) {
 			} else {
 				unlink(record_file);
 			}
-		}
-		BC_ASSERT_EQUAL((unterminated_calls=ms_list_size(mgr->lc->calls)), 0, int, "%i");
-		if (unterminated_calls != 0) {
-			ms_error("There are still %d calls pending, please terminates them before invoking linphone_core_manager_destroy().", unterminated_calls);
 		}
 		linphone_core_destroy(mgr->lc);
 	}
@@ -473,9 +475,11 @@ void liblinphone_tester_add_suites() {
 	bc_tester_add_suite(&tunnel_test_suite);
 	bc_tester_add_suite(&offeranswer_test_suite);
 	bc_tester_add_suite(&call_test_suite);
+	bc_tester_add_suite(&audio_bypass_suite);
 	bc_tester_add_suite(&multi_call_test_suite);
 	bc_tester_add_suite(&message_test_suite);
 	bc_tester_add_suite(&presence_test_suite);
+	bc_tester_add_suite(&presence_server_test_suite);
 #ifdef UPNP
 	bc_tester_add_suite(&upnp_test_suite);
 #endif
@@ -542,6 +546,7 @@ void liblinphone_tester_before_each(void) {
 static char* all_leaks_buffer = NULL;
 
 int liblinphone_tester_after_each(void) {
+	int err = 0;
 	if (!liblinphone_tester_leak_detector_disabled){
 		int leaked_objects = belle_sip_object_get_object_count() - leaked_objects_count;
 		if (leaked_objects > 0) {
@@ -564,11 +569,11 @@ int liblinphone_tester_after_each(void) {
 			// if the test is NOT marked as leaking memory and it actually is, we should make it fail
 			if (!leaks_expected && leaked_objects > 0) {
 				BC_FAIL("This test is leaking memory!");
-				return 1;
+				err = 1;
 				// and reciprocally
 			} else if (leaks_expected && leaked_objects == 0) {
 				BC_FAIL("This test is not leaking anymore, please remove LeaksMemory tag!");
-				return 1;
+				// err = 1; // do not force fail actually, because it can be some false positive warning
 			}
 		}
 	}
@@ -576,7 +581,7 @@ int liblinphone_tester_after_each(void) {
 	if (manager_count != 0) {
 		ms_fatal("%d Linphone core managers are still alive!", manager_count);
 	}
-	return 0;
+	return err;
 }
 
 void liblinphone_tester_uninit(void) {

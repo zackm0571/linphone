@@ -105,7 +105,7 @@ static void linphone_proxy_config_init(LinphoneCore* lc, LinphoneProxyConfig *cf
 	const char *quality_reporting_collector = lc ? lp_config_get_default_string(lc->config, "proxy", "quality_reporting_collector", NULL) : NULL;
 	const char *contact_params = lc ? lp_config_get_default_string(lc->config, "proxy", "contact_parameters", NULL) : NULL;
 	const char *contact_uri_params = lc ? lp_config_get_default_string(lc->config, "proxy", "contact_uri_parameters", NULL) : NULL;
-
+	const char *refkey = lc ? lp_config_get_default_string(lc->config, "proxy", "refkey", NULL) : NULL;
 	cfg->expires = lc ? lp_config_get_default_int(lc->config, "proxy", "reg_expires", 3600) : 3600;
 	cfg->reg_sendregister = lc ? lp_config_get_default_int(lc->config, "proxy", "reg_sendregister", 1) : 1;
 	cfg->dial_prefix = dial_prefix ? ms_strdup(dial_prefix) : NULL;
@@ -123,7 +123,8 @@ static void linphone_proxy_config_init(LinphoneCore* lc, LinphoneProxyConfig *cf
 	cfg->contact_uri_params = contact_uri_params ? ms_strdup(contact_uri_params) : NULL;
 	cfg->avpf_mode = lc ? lp_config_get_default_int(lc->config, "proxy", "avpf", LinphoneAVPFDefault) : LinphoneAVPFDefault;
 	cfg->avpf_rr_interval = lc ? lp_config_get_default_int(lc->config, "proxy", "avpf_rr_interval", 5) : 5;
-	cfg->publish_expires=-1;
+	cfg->publish_expires= lc ? lp_config_get_default_int(lc->config, "proxy", "publish_expires", -1) : -1;
+	cfg->refkey = refkey ? ms_strdup(refkey) : NULL;
 }
 
 LinphoneProxyConfig *linphone_proxy_config_new() {
@@ -197,6 +198,7 @@ void _linphone_proxy_config_release_ops(LinphoneProxyConfig *cfg){
 		cfg->op=NULL;
 	}
 	if (cfg->long_term_event){
+		linphone_event_terminate(cfg->long_term_event);
 		linphone_event_unref(cfg->long_term_event);
 		cfg->long_term_event=NULL;
 	}
@@ -218,6 +220,7 @@ void _linphone_proxy_config_destroy(LinphoneProxyConfig *cfg){
 	if (cfg->saved_identity!=NULL) linphone_address_destroy(cfg->saved_identity);
 	if (cfg->sent_headers!=NULL) sal_custom_header_free(cfg->sent_headers);
 	if (cfg->pending_contact) linphone_address_unref(cfg->pending_contact);
+	if (cfg->refkey) ms_free(cfg->refkey);
 	_linphone_proxy_config_release_ops(cfg);
 }
 
@@ -940,6 +943,9 @@ char* linphone_proxy_config_normalize_phone_number(LinphoneProxyConfig *proxy, c
 											, flatten_start);
 				ms_debug("Prepended prefix resulted in %s", result);
 			}
+		}else if (tmpproxy->dial_escape_plus){
+			/* user did not provide dial prefix, so we'll take the most generic one */
+			result = replace_plus_with_icp(flatten,most_common_dialplan.icp);
 		}
 		if (result==NULL) {
 			result = flatten;
@@ -1056,6 +1062,12 @@ int linphone_proxy_config_done(LinphoneProxyConfig *cfg)
 			if (!cfg->publish) {
 				/*publish is terminated*/
 				linphone_event_terminate(cfg->long_term_event);
+			} else {
+				const char * sip_etag = linphone_event_get_custom_header(cfg->long_term_event, "SIP-ETag");
+				if (sip_etag) {
+					if (cfg->sip_etag) ms_free(cfg->sip_etag);
+					cfg->sip_etag = ms_strdup(sip_etag);
+				}
 			}
 			linphone_event_unref(cfg->long_term_event);
 			cfg->long_term_event = NULL;
@@ -1110,6 +1122,11 @@ int linphone_proxy_config_send_publish(LinphoneProxyConfig *proxy, LinphonePrese
 		linphone_content_set_buffer(content,presence_body,strlen(presence_body));
 		linphone_content_set_type(content, "application");
 		linphone_content_set_subtype(content,"pidf+xml");
+		if (proxy->sip_etag) {
+			linphone_event_add_custom_header(proxy->long_term_event, "SIP-If-Match", proxy->sip_etag);
+			ms_free(proxy->sip_etag);
+			proxy->sip_etag=NULL;
+		}
 		err = linphone_event_send_publish(proxy->long_term_event, content);
 		linphone_content_unref(content);
 		ms_free(presence_body);
@@ -1122,6 +1139,10 @@ void _linphone_proxy_config_unpublish(LinphoneProxyConfig *obj) {
 		&& (linphone_event_get_publish_state(obj->long_term_event) == LinphonePublishOk ||
 					(linphone_event_get_publish_state(obj->long_term_event)  == LinphonePublishProgress && obj->publish_expires != 0))) {
 		linphone_event_unpublish(obj->long_term_event);
+	}
+	if (obj->sip_etag) {
+		ms_free(obj->sip_etag);
+		obj->sip_etag=NULL;
 	}
 }
 
@@ -1332,6 +1353,8 @@ void linphone_proxy_config_write_to_config_file(LpConfig *config, LinphoneProxyC
 	lp_config_set_int(config,key,"dial_escape_plus",cfg->dial_escape_plus);
 	lp_config_set_string(config,key,"dial_prefix",cfg->dial_prefix);
 	lp_config_set_int(config,key,"privacy",cfg->privacy);
+	if (cfg->refkey) lp_config_set_string(config,key,"refkey",cfg->refkey);
+	lp_config_set_int(config, key, "publish_expires", cfg->publish_expires);
 }
 
 
@@ -1388,6 +1411,10 @@ LinphoneProxyConfig *linphone_proxy_config_new_from_config_file(LinphoneCore* lc
 	if (tmp!=NULL && strlen(tmp)>0)
 		linphone_proxy_config_set_sip_setup(cfg,tmp);
 	CONFIGURE_INT_VALUE(cfg,config,key,privacy,"privacy")
+
+	CONFIGURE_STRING_VALUE(cfg,config,key,ref_key,"refkey")
+	CONFIGURE_INT_VALUE(cfg,config,key,publish_expires,"publish_expires")
+
 	return cfg;
 }
 
@@ -1637,4 +1664,16 @@ const struct _LinphoneAuthInfo* linphone_proxy_config_find_auth_info(const Linph
 	const char* username = cfg->identity_address ? linphone_address_get_username(cfg->identity_address) : NULL;
 	const char* domain =  cfg->identity_address ? linphone_address_get_domain(cfg->identity_address) : NULL;
 	return _linphone_core_find_auth_info(cfg->lc, cfg->realm, username, domain, TRUE);
+}
+
+const char * linphone_proxy_config_get_ref_key(const LinphoneProxyConfig *cfg) {
+	return cfg->refkey;
+}
+
+void linphone_proxy_config_set_ref_key(LinphoneProxyConfig *cfg, const char *refkey) {
+	if (cfg->refkey!=NULL){
+		ms_free(cfg->refkey);
+		cfg->refkey=NULL;
+	}
+	if (refkey) cfg->refkey=ms_strdup(refkey);
 }

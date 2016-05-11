@@ -426,11 +426,8 @@ static void carddav_sync_2(void) {
 
 	unlink(friends_db);
 	linphone_core_set_friends_database_path(manager->lc, friends_db);
-<<<<<<< HEAD
-	BC_ASSERT_EQUAL_FATAL(linphone_friend_list_add_local_friend(lfl, lf), LinphoneFriendListOK, int, "%d");
-=======
 	BC_ASSERT_EQUAL(linphone_friend_list_add_local_friend(lfl, lf), LinphoneFriendListOK, int, "%d");
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
+
 	linphone_friend_unref(lf);
 
 	linphone_carddav_set_user_data(c, stats);
@@ -472,11 +469,7 @@ static void carddav_sync_3(void) {
 
 	unlink(friends_db);
 	linphone_core_set_friends_database_path(manager->lc, friends_db);
-<<<<<<< HEAD
-    BC_ASSERT_EQUAL_FATAL(linphone_friend_list_add_local_friend(lfl, lf), LinphoneFriendListOK, int, "%d");
-=======
 	BC_ASSERT_EQUAL(linphone_friend_list_add_local_friend(lfl, lf), LinphoneFriendListOK, int, "%d");
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	linphone_friend_unref(lf);
 
 	linphone_carddav_set_user_data(c, stats);
@@ -729,10 +722,7 @@ static void carddav_server_to_client_and_client_to_sever_sync(void) {
 	LinphoneFriend *lf1 = linphone_friend_new_from_vcard(lvc1);
 	LinphoneVcard *lvc2 = linphone_vcard_new_from_vcard4_buffer("BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Ghislain Mary\r\nIMPP;TYPE=work:sip:ghislain@sip.linphone.org\r\nEND:VCARD\r\n");
 	LinphoneFriend *lf2 = linphone_friend_new_from_vcard(lvc2);
-<<<<<<< HEAD
-=======
 	MSList *friends = NULL, *friends_iterator = NULL;
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	
 	linphone_friend_list_cbs_set_user_data(cbs, stats);
 	linphone_friend_list_cbs_set_contact_created(cbs, carddav_contact_created);
@@ -743,16 +733,6 @@ static void carddav_server_to_client_and_client_to_sever_sync(void) {
 	linphone_friend_list_set_uri(lfl, CARDDAV_SERVER);
 	
 	linphone_friend_list_add_friend(lfl, lf1);
-<<<<<<< HEAD
-	linphone_friend_list_synchronize_friends_from_server(lfl);
-	linphone_friend_list_add_friend(lfl, lf2);
-	wait_for_until(manager->lc, NULL, &stats->sync_done_count, 3, 15000);
-	BC_ASSERT_EQUAL(stats->sync_done_count, 3, int, "%i");
-
-	ms_free(stats);
-	linphone_friend_unref(lf1);
-	linphone_friend_unref(lf2);
-=======
 	linphone_friend_unref(lf1);
 	linphone_friend_list_synchronize_friends_from_server(lfl);
 	linphone_friend_list_add_friend(lfl, lf2);
@@ -776,7 +756,6 @@ static void carddav_server_to_client_and_client_to_sever_sync(void) {
 	ms_list_free(friends);
 
 	ms_free(stats);
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	linphone_friend_list_unref(lfl);
 	linphone_core_manager_destroy(manager);
 }

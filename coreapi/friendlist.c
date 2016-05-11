@@ -547,20 +547,10 @@ static void carddav_updated(LinphoneCardDavContext *cdc, LinphoneFriend *lf_new,
 
 void linphone_friend_list_synchronize_friends_from_server(LinphoneFriendList *list) {
 	LinphoneCardDavContext *cdc = NULL;
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	if (!list || !list->uri || !list->lc) {
 		ms_error("FATAL");
 		return;
 	}
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 618661f0b72e8a0284afd779ba4773e3e80af5da
 	cdc = linphone_carddav_context_new(list);
 	if (cdc) {
 		cdc->contact_created_cb = carddav_created;

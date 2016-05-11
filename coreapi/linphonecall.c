@@ -3527,7 +3527,6 @@ static void linphone_call_start_text_stream(LinphoneCall *call) {
 	}
 }
 
-<<<<<<< HEAD
 static void setZrtpCryptoTypesParameters(MSZrtpParams *params, LinphoneCore *lc)
 {
 	int i;

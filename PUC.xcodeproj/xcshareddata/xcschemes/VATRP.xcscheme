@@ -17,7 +17,7 @@
                BlueprintIdentifier = "4AC389C41B8E87530063298F"
                BuildableName = "ACE.app"
                BlueprintName = "VATRP"
-               ReferencedContainer = "container:ACE.xcodeproj">
+               ReferencedContainer = "container:PUC.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -31,7 +31,7 @@
                BlueprintIdentifier = "4AC389DA1B8E87530063298F"
                BuildableName = "VATRPTests.xctest"
                BlueprintName = "VATRPTests"
-               ReferencedContainer = "container:ACE.xcodeproj">
+               ReferencedContainer = "container:PUC.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -49,7 +49,7 @@
                BlueprintIdentifier = "4AC389DA1B8E87530063298F"
                BuildableName = "VATRPTests.xctest"
                BlueprintName = "VATRPTests"
-               ReferencedContainer = "container:ACE.xcodeproj">
+               ReferencedContainer = "container:PUC.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -59,7 +59,7 @@
             BlueprintIdentifier = "4AC389C41B8E87530063298F"
             BuildableName = "ACE.app"
             BlueprintName = "VATRP"
-            ReferencedContainer = "container:ACE.xcodeproj">
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -82,7 +82,7 @@
             BlueprintIdentifier = "4AC389C41B8E87530063298F"
             BuildableName = "ACE.app"
             BlueprintName = "VATRP"
-            ReferencedContainer = "container:ACE.xcodeproj">
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -101,7 +101,7 @@
             BlueprintIdentifier = "4AC389C41B8E87530063298F"
             BuildableName = "ACE.app"
             BlueprintName = "VATRP"
-            ReferencedContainer = "container:ACE.xcodeproj">
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

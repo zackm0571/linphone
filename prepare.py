@@ -140,7 +140,7 @@ def gpl_disclaimer(platforms):
 
 def extract_from_xcode_project_with_regex(regex):
     l = []
-    f = open('linphone.xcodeproj/project.pbxproj', 'r')
+    f = open('PUC.xcodeproj/project.pbxproj', 'r')
     lines = f.readlines()
     f.close()
     for line in lines:

@@ -14,10 +14,24 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F0BB8BD41936208100974404"
-               BuildableName = "liblinphoneTester.app"
-               BlueprintName = "liblinphoneTester"
-               ReferencedContainer = "container:linphone.xcodeproj">
+               BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
+               BuildableName = "linphone.app"
+               BlueprintName = "PUC"
+               ReferencedContainer = "container:PUC.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F0F951FF1A6AEB1000254160"
+               BuildableName = "PUC.xctest"
+               BlueprintName = "PUCTests"
+               ReferencedContainer = "container:PUC.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,24 +42,14 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F08F118319C09C6A007D70C2"
-               BuildableName = "liblinphoneTesterTests.xctest"
-               BlueprintName = "liblinphoneTesterTests"
-               ReferencedContainer = "container:linphone.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F0BB8BD41936208100974404"
-            BuildableName = "liblinphoneTester.app"
-            BlueprintName = "liblinphoneTester"
-            ReferencedContainer = "container:linphone.xcodeproj">
+            BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
+            BuildableName = "linphone.app"
+            BlueprintName = "PUC"
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -65,13 +69,18 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F0BB8BD41936208100974404"
-            BuildableName = "liblinphoneTester.app"
-            BlueprintName = "liblinphoneTester"
-            ReferencedContainer = "container:linphone.xcodeproj">
+            BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
+            BuildableName = "linphone.app"
+            BlueprintName = "PUC"
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
+         <AdditionalOption
+            key = "NSZombieEnabled"
+            value = "YES"
+            isEnabled = "YES">
+         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
@@ -84,10 +93,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F0BB8BD41936208100974404"
-            BuildableName = "liblinphoneTester.app"
-            BlueprintName = "liblinphoneTester"
-            ReferencedContainer = "container:linphone.xcodeproj">
+            BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
+            BuildableName = "linphone.app"
+            BlueprintName = "PUC"
+            ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
@@ -95,7 +104,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Distribution"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

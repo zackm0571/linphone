@@ -140,6 +140,10 @@
     [self changeViewTo:testingViewController.view];
 }
 
+-(void) changeViewToMediaTab{
+    [self changeViewTo:mediaViewController.view];
+}
+
 - (void) changeViewTo:(NSView*)view
 {
     for (NSView *subview in [viewContainer subviews]) {

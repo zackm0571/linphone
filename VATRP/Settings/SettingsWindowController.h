@@ -16,4 +16,5 @@
 -(void) initializeData;
 - (void) addPreferencesToolbarItem;
 -(void)closeWindow;
+-(void) changeViewToMediaTab;
 @end

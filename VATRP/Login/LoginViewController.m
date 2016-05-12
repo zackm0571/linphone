@@ -16,7 +16,7 @@
 #import "Utils.h"
 #import "DefaultSettingsManager.h"
 #import "CustomComboBox.h"
-
+#import "ViewManager.h"
 @interface LoginViewController ()<DefaultSettingsManagerDelegate, CustomComboBoxDelegate> {
     AccountModel *loginAccount;
     bool loginClicked;
@@ -543,6 +543,14 @@
 //                const char* userName = linphone_core_get_identity([LinphoneManager getLc]);
                 
 ////            }
+            
+            if(![[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"FIRST_LOGIN"]){
+                [[[ViewManager sharedInstance] dockView] openSettings];
+                AppDelegate *app = [AppDelegate sharedInstance];
+                [[app settingsWindowController] changeViewToMediaTab];
+                [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"FIRST_LOGIN"];
+            }
+
                 [[AccountsService sharedInstance] addAccountWithUsername:loginAccount.username
                                                                   UserID:loginAccount.userID
                                                                 Password:loginAccount.password

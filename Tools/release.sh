@@ -61,7 +61,7 @@ done
 
 # Generate an archive for this project
 
-XCARCHIVE=/tmp/ace-mac.xcarchive
+XCARCHIVE=/tmp/puc-mac.xcarchive
 
 if [ -e "${XCARCHIVE}" ]; then
   rm -fr "${XCARCHIVE}"
@@ -268,7 +268,7 @@ else
 
   /tmp/github-release release \
       --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-      --repo ${GITHUB_REPO[1]:-ace-mac} \
+      --repo ${GITHUB_REPO[1]:-puc-mac} \
       --tag $tag \
       --name "Travis-CI Automated $tag" \
       --description "$(git log -1 --pretty=format:%B)" \
@@ -297,7 +297,7 @@ else
 #   echo "Uploading $dmg github release $tag : $(ls -la $dmg)"
 #   /tmp/github-release upload \
 #        --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-#        --repo ${GITHUB_REPO[1]:-ace-mac} \
+#        --repo ${GITHUB_REPO[1]:-puc-mac} \
 #        --tag $tag \
 #        --name $(basename "$dmg") \
 #        --file "$dmg"
@@ -307,7 +307,7 @@ else
     echo "Uploading $PKG_FILE github release $tag : $(ls -la $PKG_FILE)"
     /tmp/github-release upload \
         --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-        --repo ${GITHUB_REPO[1]:-ace-mac} \
+        --repo ${GITHUB_REPO[1]:-puc-mac} \
         --tag $tag \
         --name $(basename "$PKG_FILE") \
         --file "$PKG_FILE"
@@ -318,7 +318,7 @@ else
     echo "Uploading $APP_DMG_FILE as $TARGET to github release $tag : $(ls -la $APP_DMG_FILE)"
     /tmp/github-release upload \
         --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-        --repo ${GITHUB_REPO[1]:-ace-mac} \
+        --repo ${GITHUB_REPO[1]:-puc-mac} \
         --tag $tag \
         --name $TARGET \
         --file "$APP_DMG_FILE"
@@ -329,7 +329,7 @@ else
     echo "Uploading $DSYM_ZIP_FILE as $TARGET to github release $tag : $(ls -la $DSYM_ZIP_FILE)"
     /tmp/github-release upload \
         --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-        --repo ${GITHUB_REPO[1]:-ace-mac} \
+        --repo ${GITHUB_REPO[1]:-puc-mac} \
         --tag $tag \
         --name $TARGET \
         --file "$DSYM_ZIP_FILE"

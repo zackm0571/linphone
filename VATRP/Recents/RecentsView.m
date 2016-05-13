@@ -68,10 +68,10 @@
                                                      name:kLinphoneCallUpdate
                                                    object:nil];
     
-        [[NSNotificationCenter defaultCenter] addObserver:self
+       /* [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(dialpadTextUpdate:)
                                                      name:DIALPAD_TEXT_CHANGED
-                                                   object:nil];
+                                                   object:nil];*/
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(contactEditDone:)
                                                      name:@"contactInfoEditDone"

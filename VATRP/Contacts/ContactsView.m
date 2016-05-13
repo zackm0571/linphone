@@ -114,10 +114,10 @@
                                              selector:@selector(contactEditDone:)
                                                  name:@"contactInfoEditDone"
                                                object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
+  /*  [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(dialpadTextUpdate:)
                                                  name:@"DIALPAD_TEXT_CHANGED"
-                                               object:nil];
+                                               object:nil];*/
 }
 
 - (void)contactInfoFillDone:(NSNotification*)notif {

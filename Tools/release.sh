@@ -51,7 +51,7 @@ set -e
 
 # Generate an archive for this project
 
-XCARCHIVE_FILE=/tmp/ace-ios.xcarchive
+XCARCHIVE_FILE=/tmp/PUC.xcarchive
 
 xctool -project linphone.xcodeproj \
        -scheme linphone \
@@ -93,7 +93,7 @@ else
 
   /tmp/github-release release \
     --user ${GITHUB_REPO[0]:-VTCSecureLLC} \
-    --repo ${GITHUB_REPO[1]:-ace-ios} \
+    --repo ${GITHUB_REPO[1]:-puc-ios} \
     --tag $tag \
     --name "Travis-CI Automated $tag" \
     --description "$(git log -1 --pretty=format:%B)" \
@@ -108,7 +108,7 @@ if [ -z "$HOCKEYAPP_TOKEN" ]; then
   echo HOCKEYAPP_TOKEN is not defined. Not deploying via HockeyApp.
 else
   set -x
-  IPA_FILE=/tmp/ace-ios.ipa
+  IPA_FILE=/tmp/puc-ios.ipa
 
   # Generate an ipa from the archive
 

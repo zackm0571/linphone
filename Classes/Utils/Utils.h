@@ -21,15 +21,15 @@
 #define LINPHONE_UTILS_H
 
 #define DYNAMIC_CAST(x, cls)                        \
- ({                                                 \
-    cls *inst_ = (cls *)(x);                        \
-    [inst_ isKindOfClass:[cls class]]? inst_ : nil; \
- })
+({                                                 \
+cls *inst_ = (cls *)(x);                        \
+[inst_ isKindOfClass:[cls class]]? inst_ : nil; \
+})
 
 #import <ortp/ortp.h>
 
 @interface LinphoneLogger : NSObject {
-
+    
 }
 
 + (void)log:(OrtpLogLevel)severity file:(const char *)file line:(int)line format:(NSString *)format, ...;
@@ -37,7 +37,7 @@ void linphone_iphone_log_handler(const char *domain, OrtpLogLevel lev, const cha
 @end
 
 @interface LinphoneUtils : NSObject {
-
+    
 }
 
 + (BOOL)findAndResignFirstResponder:(UIView*)view;
@@ -53,7 +53,7 @@ void linphone_iphone_log_handler(const char *domain, OrtpLogLevel lev, const cha
 + (NSArray*)normalizeServerArray:(NSArray*)arrayOfObjects;
 + (NSString*) normalizeServerString:(NSString*)value;
 + (NSString*)cardDAVRealmName;
-+ (NSString*)cardDAVServerPath;
++ (NSString*)cardDAVServerDomain;
 
 @end
 

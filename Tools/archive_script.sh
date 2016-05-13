@@ -19,7 +19,7 @@ touch $LOGFILE
 ) &
 MUTED_PID=$!
 
-xcodebuild -project linphone.xcodeproj -scheme linphone -sdk iphoneos -configuration \
+xcodebuild -project PUC.xcodeproj -scheme linphone -sdk iphoneos -configuration \
   Debug build CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" CODE_SIGN_ENTITLEMENTS="" \
   >> $LOGFILE 2>&1
 

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "linphone.app"
+               BuildableName = "PUC.app"
                BlueprintName = "PUC"
                ReferencedContainer = "container:PUC.xcodeproj">
             </BuildableReference>
@@ -47,7 +47,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "linphone.app"
+            BuildableName = "PUC.app"
             BlueprintName = "PUC"
             ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "linphone.app"
+            BuildableName = "PUC.app"
             BlueprintName = "PUC"
             ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>
@@ -94,7 +94,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "linphone.app"
+            BuildableName = "PUC.app"
             BlueprintName = "PUC"
             ReferencedContainer = "container:PUC.xcodeproj">
          </BuildableReference>

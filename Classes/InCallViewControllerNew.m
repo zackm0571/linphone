@@ -1744,6 +1744,7 @@ CGSize tempLocalCellSize;
     //[self sortChatEntriesArray];
     [self.tableView reloadData];
     [self showLatestMessage];
+    [self insertTextIntoMinimizedTextBuffer:@"\n"];
     [self insertTextIntoMinimizedTextBuffer:text];
 }
 CGSize tempRemoteCellSize;

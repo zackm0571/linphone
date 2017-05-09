@@ -196,8 +196,13 @@ class LinphoneCallImpl implements LinphoneCall {
 	}
 	
 	private native void takeSnapshot(long nativePtr, String path);
+	private native void takePreviewSnapshot(long nativePtr, String path);
+	
 	public void takeSnapshot(String path) {
 		takeSnapshot(nativePtr, path);
+	}
+	public void takePreviewSnapshot(String path) {
+		takePreviewSnapshot(nativePtr, path);
 	}
 
 	private native void zoomVideo(long nativePtr, float factor, float cx, float cy);

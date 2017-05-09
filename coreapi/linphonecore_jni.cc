@@ -3458,6 +3458,13 @@ extern "C" jlongArray Java_org_linphone_core_LinphoneCoreImpl_getCallLogs(JNIEnv
 
 	return jLogs;
 }
+extern "C" void Java_org_linphone_core_LinphoneCallImpl_takePreviewSnapshot(	JNIEnv*  env
+																		,jobject  thiz
+																		,jlong ptr, jstring path) {
+	const char* filePath = GetStringUTFChars(env, path);
+	linphone_call_take_preview_snapshot((LinphoneCall*)ptr, filePath);
+	ReleaseStringUTFChars(env, path, filePath);
+}
 
 extern "C" void Java_org_linphone_core_LinphoneCallImpl_takeSnapshot(	JNIEnv*  env
 																		,jobject  thiz

@@ -318,6 +318,9 @@ public interface LinphoneCall {
 	 * Take a photo of currently received video and write it into a jpeg file.
 	 */
 	void takeSnapshot(String path);
+
+	void takePreviewSnapshot(String path);
+	
 	
 	/**
 	 * Scale the video by factor, and center it using cx,cy point
